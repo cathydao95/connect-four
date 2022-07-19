@@ -1,5 +1,7 @@
-import Column from "./Column";
 import { useState, useEffect } from "react";
+import Button from "./Button";
+import { deepClone, checkForWinner } from "../gameUtils";
+import GameInfo from "./GameInfo";
 
 function Main() {
   const [board, setBoard] = useState([
@@ -16,16 +18,49 @@ function Main() {
   const [winner, setWinner] = useState("");
 
   console.log(board);
+
+  useEffect(() => {
+    setWinner(window.connectFour.checkForWinner(board));
+  }, [board]);
+
+  console.log(winner);
+
   return (
     <div>
-      <h1>Red's Turn</h1>
+      <GameInfo redTurn={redTurn} winner={winner} />
       <div className="container">
-        {board.map((item, index) => {
+        {board.map((column, index) => {
+          function handleDrop() {
+            setRedTurn((prevTurn) => !prevTurn);
+            const nextEmptySpot = column.indexOf(null);
+            setBoard((prevBoard) => {
+              const clonedBoard = window.connectFour.deepClone(board);
+              if (redTurn) {
+                clonedBoard[index][nextEmptySpot] = "Player 1";
+              } else {
+                clonedBoard[index][nextEmptySpot] = "Player 2";
+              }
+              return clonedBoard;
+            });
+          }
+
           return (
-            <div className="column" key={index}>
-              {item.map((item, index) => (
-                <div key={index} className="box"></div>
-              ))}
+            <div key={index}>
+              <Button
+                handleDrop={handleDrop}
+                disableButton={!column.includes(null) || winner}
+              />
+              <div className="column">
+                {column.map((cell, index) => (
+                  <div key={index} className="cell">
+                    <div
+                      className={`circle ${cell === "Player 1" && "red"} ${
+                        cell === "Player 2" && "yellow"
+                      }`}
+                    ></div>
+                  </div>
+                ))}
+              </div>
             </div>
           );
         })}
