@@ -13,7 +13,7 @@ function Main() {
     [null, null, null, null, null, null],
     [null, null, null, null, null, null],
   ]);
-  const [playing, setPlaying] = useState(false);
+
   const [redTurn, setRedTurn] = useState(true);
   const [winner, setWinner] = useState("");
 
@@ -23,11 +23,30 @@ function Main() {
     setWinner(window.connectFour.checkForWinner(board));
   }, [board]);
 
-  console.log(winner);
+  console.log("winner", winner);
+
+  function restartGame() {
+    setBoard([
+      [null, null, null, null, null, null],
+      [null, null, null, null, null, null],
+      [null, null, null, null, null, null],
+      [null, null, null, null, null, null],
+      [null, null, null, null, null, null],
+      [null, null, null, null, null, null],
+      [null, null, null, null, null, null],
+    ]);
+    setRedTurn(true);
+    setWinner("");
+  }
 
   return (
     <div>
       <GameInfo redTurn={redTurn} winner={winner} />
+      {winner ? (
+        <button className="restart-button" type="button" onClick={restartGame}>
+          Restart Game
+        </button>
+      ) : null}
       <div className="container">
         {board.map((column, index) => {
           function handleDrop() {
@@ -46,10 +65,13 @@ function Main() {
 
           return (
             <div key={index}>
-              <Button
-                handleDrop={handleDrop}
-                disableButton={!column.includes(null) || winner}
-              />
+              {winner ? null : (
+                <Button
+                  handleDrop={handleDrop}
+                  disableButton={!column.includes(null) || winner}
+                />
+              )}
+
               <div className="column">
                 {column.map((cell, index) => (
                   <div key={index} className="cell">
